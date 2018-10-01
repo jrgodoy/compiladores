@@ -65,6 +65,7 @@ void sigLex()
 		{
 			//es un identificador (o palabra reservada)
 			i=0;
+
 			do{
 				id[i]=c;
 				i++;
@@ -79,13 +80,18 @@ void sigLex()
 				c=0;
 			t.pe=buscar(id);
 			t.compLex=t.pe->compLex;
-			if (t.pe->compLex==-1)
-			{
-				strcpy(e.lexema,id);
-				e.compLex=ID;
-				insertar(e);
+			if (id == "null" || id == "NULL") {
+				t.compLex=PR_NULL;
 				t.pe=buscar(id);
-				t.compLex=ID;
+			} else {
+				if (t.pe->compLex==-1)
+				{
+					strcpy(e.lexema,id);
+					e.compLex=ATRIBUTO;
+					insertar(e);
+					t.pe=buscar(id);
+					t.compLex=ATRIBUTO;
+				}
 			}
 			break;
 		}
@@ -305,9 +311,11 @@ void sigLex()
 			if (t.pe->compLex==-1)
 			{
 				strcpy(e.lexema,id);
-				if (strlen(id)==3 || strcmp(id,"''''")==0)
+				/*if (strlen(id)==3 || strcmp(id,"''''")==0)
+					
 					//e.compLex=CAR;
-				else
+				else*/
+				if (!(strlen(id)==3 || strcmp(id,"''''")==0))
 					e.compLex=LITERAL_CADENA;
 				insertar(e);
 				t.pe=buscar(id);
@@ -338,7 +346,23 @@ int main(int argc,char* args[])
 
 	initTabla();
 	initTablaSimbolos();
-	
+
+	char *comp_lex [13]; // vector definido para almacenar los componentes lexicos
+
+    	comp_lex [0]= "L_CORCHETE";
+    	comp_lex [1]= "R_CORCHETE" ;
+    	comp_lex [2]= "L_LLAVE";
+    	comp_lex [3]= "R_LLAVE";
+    	comp_lex [4]= "COMA";
+    	comp_lex [5]= "DOS_PUNTOS";
+    	comp_lex [6]= "LITERAL_CADENA";
+    	comp_lex [7]= "LITERAL_NUM";
+    	comp_lex [8]= "PR_TRUE";
+    	comp_lex [9]= "PR_FALSE";
+    	comp_lex [10]= "PR_NULL";
+	comp_lex [11]= "ATRIBUTO";
+    	comp_lex [-1]= "EOF";	
+
 	if(argc > 1)
 	{
 		if (!(archivo=fopen(args[1],"rt")))
@@ -348,7 +372,7 @@ int main(int argc,char* args[])
 		}
 		while (t.compLex!=EOF){
 			sigLex();
-			printf("Lin %d: %s -> %d\n",numLinea,t.pe->lexema,t.compLex);
+			printf("Lin %d: %s -> %s\n",numLinea,t.pe->lexema,comp_lex[t.compLex]);
 		}
 		fclose(archivo);
 	}else{

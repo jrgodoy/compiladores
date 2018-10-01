@@ -16,8 +16,10 @@
 #define LITERAL_CADENA	6
 #define LITERAL_NUM	7
 #define PR_TRUE		8
-#define PR_NULL		9
-#define EOF		-1
+#define PR_FALSE	9
+#define PR_NULL		10
+#define ATRIBUTO	11
+#define FIN		-1
 // Fin Codigos
 #define TAMBUFF 	5
 #define TAMLEX 		50

@@ -1,0 +1,8 @@
+{
+	"cadena": "hola",
+	"numero": 21,
+	"point": 0.8,
+	"null": null,
+	"boolean": TRUE,
+	"array": []
+}
