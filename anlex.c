@@ -203,11 +203,11 @@ void sigLex()
 						if (t.pe->compLex==-1)
 						{
 							strcpy(e.lexema,id);
-							e.compLex=NUM;
+							e.compLex=LITERAL_NUM;
 							insertar(e);
 							t.pe=buscar(id);
 						}
-						t.compLex=NUM;
+						t.compLex=LITERAL_NUM;
 						break;
 					case -1:
 						if (c==EOF)
@@ -219,164 +219,60 @@ void sigLex()
 				}
 			break;
 		}
-		else if (c=='<') 
-		{
-			//es un operador relacional, averiguar cual
-			c=fgetc(archivo);
-			if (c=='>'){
-				t.compLex=OPREL;
-				t.pe=buscar("<>");
-			}
-			else if (c=='='){
-				t.compLex=OPREL;
-				t.pe=buscar("<=");
-			}
-			else{
-				ungetc(c,archivo);
-				t.compLex=OPREL;
-				t.pe=buscar("<");
-			}
-			break;
-		}
-		else if (c=='>')
-		{
-			//es un operador relacional, averiguar cual
-				c=fgetc(archivo);
-			if (c=='='){
-				t.compLex=OPREL;
-				t.pe=buscar(">=");
-			}
-			else{
-				ungetc(c,archivo);
-				t.compLex=OPREL;
-				t.pe=buscar(">");
-			}
-			break;
-		}
+		
 		else if (c==':')
 		{
 			//puede ser un : o un operador de asignacion
-			c=fgetc(archivo);
-			if (c=='='){
-				t.compLex=OPASIGNA;
-				t.pe=buscar(":=");
-			}
-			else{
-				ungetc(c,archivo);
-				t.compLex=':';
+
+				t.compLex=DOS_PUNTOS;
 				t.pe=buscar(":");
-			}
+			
 			break;
-		}
-		else if (c=='+')
-		{
-			t.compLex=OPSUMA;
-			t.pe=buscar("+");
-			break;
-		}
-		else if (c=='-')
-		{
-			t.compLex=OPSUMA;
-			t.pe=buscar("-");
-			break;
-		}
-		else if (c=='*')
-		{
-			t.compLex=OPMULT;
-			t.pe=buscar("*");
-			break;
-		}
-		else if (c=='/')
-		{
-			t.compLex=OPMULT;
-			t.pe=buscar("/");
-			break;
-		}
-		else if (c=='=')
-		{
-			t.compLex=OPREL;
-			t.pe=buscar("=");
-			break;
-		}
+		}		
+		
 		else if (c==',')
 		{
-			t.compLex=',';
+			t.compLex=COMA;
 			t.pe=buscar(",");
 			break;
 		}
-		else if (c==';')
+		
+		else if (c=='{')
 		{
-			t.compLex=';';
-			t.pe=buscar(";");
+			t.compLex=L_LLAVE;
+			t.pe=buscar("{");
+			
 			break;
 		}
-		else if (c=='.')
+		else if (c=='}')
 		{
-			t.compLex='.';
-			t.pe=buscar(".");
-			break;
-		}
-		else if (c=='(')
-		{
-			if ((c=fgetc(archivo))=='*')
-			{//es un comentario
-				while(c!=EOF)
-				{
-					c=fgetc(archivo);
-					if (c=='*')
-					{
-						if ((c=fgetc(archivo))==')')
-						{
-							break;
-						}
-					}
-					else if(c=='\n')
-					{
-						//incrementar el numero de linea
-						numLinea++;
-					}
-				}
-				if (c==EOF)
-					error("Se llego al fin de archivo sin finalizar un comentario");
-				continue;
-			}
-			else
-			{
-				ungetc(c,archivo);
-				t.compLex='(';
-				t.pe=buscar("(");
-			}
-			break;
-		}
-		else if (c==')')
-		{
-			t.compLex=')';
-			t.pe=buscar(")");
+			t.compLex=R_LLAVE;
+			t.pe=buscar("}");
 			break;
 		}
 		else if (c=='[')
 		{
-			t.compLex='[';
+			t.compLex=L_CORCHETE;
 			t.pe=buscar("[");
 			break;
 		}
 		else if (c==']')
 		{
-			t.compLex=']';
+			t.compLex=R_CORCHETE;
 			t.pe=buscar("]");
 			break;
 		}
-		else if (c=='\'')
+		else if (c=='\"')
 		{//un caracter o una cadena de caracteres
 			i=0;
 			id[i]=c;
 			i++;
 			do{
 				c=fgetc(archivo);
-				if (c=='\'')
+				if (c=='\"')
 				{
 					c=fgetc(archivo);
-					if (c=='\'')
+					if (c=='\"')
 					{
 						id[i]=c;
 						i++;
@@ -385,7 +281,7 @@ void sigLex()
 					}
 					else
 					{
-						id[i]='\'';
+						id[i]='\"';
 						i++;
 						break;
 					}
@@ -410,32 +306,16 @@ void sigLex()
 			{
 				strcpy(e.lexema,id);
 				if (strlen(id)==3 || strcmp(id,"''''")==0)
-					e.compLex=CAR;
+					//e.compLex=CAR;
 				else
-					e.compLex=LITERAL;
+					e.compLex=LITERAL_CADENA;
 				insertar(e);
 				t.pe=buscar(id);
 				t.compLex=e.compLex;
 			}
 			break;
 		}
-		else if (c=='{')
-		{
-			//elimina el comentario
-			while(c!=EOF)
-			{
-				c=fgetc(archivo);
-				if (c=='}')
-					break;
-				else if(c=='\n')
-				{
-					//incrementar el numero de linea
-					numLinea++;
-				}
-			}
-			if (c==EOF)
-				error("Se llego al fin de archivo sin finalizar un comentario");
-		}
+		
 		else if (c!=EOF)
 		{
 			sprintf(msg,"%c no esperado",c);
